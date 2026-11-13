@@ -1,0 +1,60 @@
+{
+  "title": "Python, FastAPI, PostgreSQL, SQLAlchemy, pytest, uv",
+  "stack": [
+    "- Python 3.12 or later (version in `.python-version`); uv for the environment, the dependencies and `uv.lock`",
+    "- Web: FastAPI with Pydantic models",
+    "- Data: PostgreSQL with SQLAlchemy 2 and Alembic migrations, unless an ADR says otherwise",
+    "- Tests: pytest; Ruff for lint and format; mypy for types",
+    "- Layout: `app/` (the package), `tests/`, `alembic/`"
+  ],
+  "openChoices": [],
+  "skeleton": "`uv init --bare --python 3.12` (works in a folder that already has files), `uv python pin 3.12`, `uv add \"fastapi[standard]\" sqlalchemy alembic \"psycopg[binary]\" pydantic-settings`, `uv add --dev pytest ruff mypy`; `app/__init__.py` and `app/main.py` with a `/health` route, `tests/` with its test, `uv run alembic init alembic`; in `pyproject.toml` a `[tool.pytest.ini_options]` table with `pythonpath = [\".\"]` and `testpaths = [\"tests\"]` (so the tests import `app`); then `uv run ruff check --fix .` and `uv run ruff format .`, so the generated files (Alembic) pass the checks.",
+  "constraints": [],
+  "codeConventions": [
+    "- Type hints everywhere; `mypy app` passes.",
+    "- Ruff for lint and format; no other formatter.",
+    "- Pydantic models at the API boundary; SQLAlchemy models stay inside; no business logic in route functions.",
+    "- Settings from environment variables (pydantic-settings); `.env.example` lists every key; secrets never committed.",
+    "- An Alembic migration for every schema change; never edit a migration that has run outside a developer machine."
+  ],
+  "commands": [
+    "- Install: `uv sync`",
+    "- Test: `uv run pytest`",
+    "- Lint and types: `uv run ruff check .`, `uv run ruff format --check .`, `uv run mypy app`",
+    "- Run: `uv run fastapi dev app/main.py`"
+  ],
+  "testCommand": "uv run pytest",
+  "checks": [
+    "uv run ruff check .",
+    "uv run ruff format --check .",
+    "uv run mypy app",
+    "uv run pytest"
+  ],
+  "coverage": {
+    "replaces": "uv run pytest",
+    "command": "uv run pytest --cov=app --cov-report=xml:TestResults/coverage/coverage.xml",
+    "report": "TestResults/coverage",
+    "file": "coverage.xml"
+  },
+  "testing": [
+    "Unit: pytest in `tests/unit`, for rules with no database or network.",
+    "API and integration: pytest in `tests/integration` with FastAPI's `TestClient` against a real PostgreSQL test database migrated with Alembic; never SQLite in place of PostgreSQL.",
+    "Requirement ID in the test name: `def test_ord_01_shows_the_location()`, so `uv run pytest -k ord_01` runs one requirement.",
+    "Coverage (when `delivery.coverage` is set): the `pytest-cov` package in the dev dependencies; without it pytest stops on an unknown option and the check fails."
+  ],
+  "runSteps": "1. Install uv (it installs the Python version in `.python-version`) and PostgreSQL, or Docker.\n2. `uv sync`\n3. Copy `.env.example` to `.env` and set `DATABASE_URL`.\n4. `uv run alembic upgrade head`\n5. `uv run pytest`\n6. `uv run fastapi dev app/main.py`, then open http://127.0.0.1:8000/docs.",
+  "gitignore": [
+    ".venv/",
+    "__pycache__/",
+    "*.py[cod]",
+    ".pytest_cache/",
+    ".mypy_cache/",
+    ".ruff_cache/",
+    ".coverage",
+    "htmlcov/",
+    "TestResults/",
+    ".env",
+    "dist/",
+    "build/"
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "project-starter",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Project kickoff and day-to-day workflow skills: /kickoff, /request, /card, /decision, /question, /pr, /review, /handoff, /release, /summary, /set-language.",
   "author": { "name": "Biztech" }
 }

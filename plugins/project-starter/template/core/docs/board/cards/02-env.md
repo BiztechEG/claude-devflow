@@ -9,6 +9,8 @@ description: Development environment, solution skeleton, build, tests and CI.
 ## ENV-01 · Development environment and solution skeleton
 > status: todo | priority: P0 | layer: infra | size: M | phase: {{PHASE:setup}}{{ENV_DEPENDS}}
 
+{{ENV_SKELETON}}
+{{ENV_CHOICES}}
 - [ ] The project builds and its (empty) test suite runs with the commands in `CLAUDE.md`
 - [ ] A new machine can be set up from `README.md` alone: tool versions, build, test and run steps, and the local URL, followed as written
 - [ ] Shared build settings in one place; warnings that matter are errors

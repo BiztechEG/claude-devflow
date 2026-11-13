@@ -15,7 +15,7 @@ Then restart Claude Code. What the machine needs (Git, Node 18+, Codex or the `a
 
 1. Open Claude Code in an empty folder.
 2. Run `/project-starter:kickoff`, and tell it in the same message what the project is and any requirements you already know.
-3. Answer its questions: name, preset (`dotnet` or `none`) and modules; then how work is delivered: where pull requests live (or not decided yet), the merge style, and a coverage minimum if you want one.
+3. Answer its questions: name, preset (`dotnet`, `laravel`, `nextjs`, `python` or `none`) and modules; then how work is delivered: where pull requests live (or not decided yet), the merge style, and a coverage minimum if you want one.
 4. Read what it reports, then read the project's `CLAUDE.md` and `docs/process.md`. Card PM-01 waits for your approval of them.
 5. Choose where the repository lives (card ENV-02). With preset `none`, also choose the stack (card ARC-02).
 

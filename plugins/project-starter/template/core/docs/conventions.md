@@ -60,7 +60,7 @@ Modules add files (for example `docs/questions.md` with the `client` module, `do
 | Key | Values | Meaning |
 |---|---|---|
 | `replyLanguage` | `en`, `ar-eg` | Language of Claude's messages to the user, of review reports and of the board page. Files, code and commits stay in English |
-| `preset` | `none`, `dotnet` | Stack preset applied at kickoff |
+| `preset` | `none`, `dotnet`, `laravel`, `nextjs`, `python` | Stack preset applied at kickoff (the folders of the kit's `template/presets/`) |
 | `modules` | `client`, `regulated`, `migration`, `design-first`, `offline-deploy` | Optional parts (section 7) |
 | `reviewer.tool` | `codex`, `opencode`, `agents`, `none` | Independent reviewer used by `/project-starter:review` |
 | `reviewer.model` | string | Model for `opencode` (for example `anthropic/claude-opus-5-5`) |

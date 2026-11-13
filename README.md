@@ -9,7 +9,7 @@ A Claude Code plugin that starts any new project with the same way of working, t
 - independent read-only review batches (Codex by default; opencode or review agents) with a triage log;
 - `NEXT.md` for session hand-off, `CHANGELOG.md` and tags for releases;
 - optional modules for an outside client, regulated systems (GAMP 5 validation), data migration, design-first sign-off and offline installs;
-- a `.NET` stack preset (more presets can be added).
+- stack presets: `dotnet` (.NET, Blazor or Web API), `laravel` (PHP, Laravel, MySQL), `nextjs` (Next.js, React, Tailwind) and `python` (FastAPI, PostgreSQL); more can be added.
 
 ## Needs
 
@@ -102,5 +102,5 @@ File formats: [template/core/docs/conventions.md](plugins/project-starter/templa
 ## Extending
 
 - **New module:** `template/modules/<name>/module.json` (`title`, `docs`, `constraints`, `codeConventions`, `testing`, `phases`, `gates`, `replacements`) and a `files/` folder copied into the project. Card templates may use `{{PHASE:<key>}}` and `{{DATE}}`.
-- **New preset:** `template/presets/<name>/preset.json` (`stack`, `codeConventions`, `commands`, `testCommand`, `checks`, `coverage`, `testing`, `runSteps`, `gitignore`) and `files/`. `checks` are the build and test commands (the board check is added after them); `coverage` is `{ replaces, command, report, file }`: the test check that writes a Cobertura report, used instead of `replaces` when a coverage minimum is set; `testing` lines go into `docs/testing.md` §1.
+- **New preset:** `template/presets/<name>/preset.json` (`title`, `stack`, `openChoices`, `skeleton`, `codeConventions`, `commands`, `testCommand`, `checks`, `coverage`, `testing`, `runSteps`, `gitignore`) and `files/`. `checks` are the build and test commands (the board check is added after them); `coverage` is `{ replaces, command, report, file }`: the test check that writes a Cobertura report, used instead of `replaces` when a coverage minimum is set; `testing` lines go into `docs/testing.md` §1. `openChoices` are the decisions the preset leaves open (front end, language): they become one ENV-01 criterion, decided as ADRs before the skeleton. `skeleton` tells ENV-01 how to make the project's skeleton (a generator that needs an empty folder runs in a temporary folder and its files are moved in). `{{CODE_NAME}}` anywhere in `preset.json` becomes the project's code name. Commands in `checks` run through the shell on Windows too: call scripts through their interpreter (`php vendor/bin/pint`, not `vendor/bin/pint`).
 - Update `docs/conventions.md` §7 and the kickoff skill's module list when you add a module.

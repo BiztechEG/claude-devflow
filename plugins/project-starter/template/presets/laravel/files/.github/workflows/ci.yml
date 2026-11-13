@@ -1,0 +1,44 @@
+# Run the project checks on every pull request and on main.
+# Works on GitHub Actions and on Gitea/Forgejo Actions (same syntax). Remove it if the repo stays local only.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: testing
+          MYSQL_ROOT_PASSWORD: password
+        ports: ['3306:3306']
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: root
+      DB_PASSWORD: password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: pcov
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env && php artisan key:generate
+      # Views that use @vite need the built assets.
+      - run: if [ -f package.json ]; then npm ci && npm run build; fi
+      # The same checks as before a pull request on a dev machine: .project/config.json → delivery.checks
+      # (style, tests, board, and the coverage floor when one is set). See docs/testing.md §4.
+      - name: Checks
+        run: node tools/checks/run-checks.mjs

@@ -2,12 +2,16 @@
   "title": ".NET (C#), ASP.NET Core (Blazor UI or Web API), SQL Server, EF Core, xUnit",
   "stack": [
     "- .NET 10 (LTS), C#; SDK pinned in `global.json`",
-    "- Web: ASP.NET Core. The front end is chosen before ENV-01 builds the skeleton and recorded as an ADR: Blazor Server with MudBlazor for a line-of-business UI, a Web API only, or both",
+    "- Web: ASP.NET Core; the front end (Blazor Server with MudBlazor, a Web API only, or both) is an ADR before ENV-01",
     "- Data: SQL Server (Express for small installs) with EF Core migrations",
     "- Logging: Serilog. Background jobs: Hangfire (only when needed)",
     "- Tests: xUnit; integration tests on a real local SQL Server",
     "- Planned layout: `src/{{CODE_NAME}}.Web`, `src/{{CODE_NAME}}.Core`, `tests/{{CODE_NAME}}.Tests`"
   ],
+  "openChoices": [
+    "the front end: Blazor Server with MudBlazor for a line-of-business UI, a Web API only, or both"
+  ],
+  "skeleton": "`dotnet new sln`, then `dotnet new web` (or `blazor`) in `src/{{CODE_NAME}}.Web`, `dotnet new classlib` in `src/{{CODE_NAME}}.Core` and `dotnet new xunit` in `tests/{{CODE_NAME}}.Tests`, each added to the solution; `global.json` and `Directory.Build.props` are already here, so remove the settings they hold from each `.csproj`.",
   "constraints": [],
   "codeConventions": [
     "- Modular monolith. No CQRS, no MediatR, no extra layers.",

@@ -1,0 +1,63 @@
+{
+  "title": "Next.js (React), Tailwind CSS, shadcn/ui, Vitest, Playwright",
+  "stack": [
+    "- Node.js LTS (version in `.nvmrc` and `package.json` → `engines`); npm with `package-lock.json`",
+    "- Next.js (App Router) and React; TypeScript or JavaScript is an ADR before ENV-01",
+    "- UI: Tailwind CSS with shadcn/ui (Radix); forms with react-hook-form and zod",
+    "- Data: an ADR before ENV-01 (a front end for an existing API, called from the server, or full stack with its own database)",
+    "- Tests: Vitest with React Testing Library (unit and components), Playwright (end to end)",
+    "- Error monitoring (Sentry or another) only when an ADR adds it"
+  ],
+  "openChoices": [
+    "the language: TypeScript or JavaScript",
+    "the data: a front end for an existing API, or full stack with its own database (which database and ORM)"
+  ],
+  "skeleton": "`npx create-next-app@latest <temporary folder>` (the language from the ADR, ESLint, Tailwind CSS, App Router, `src/` folder), then move its files here, leaving its `node_modules/` and `.next/` behind: keep the kit's `README.md`, `CLAUDE.md` and `CHANGELOG.md`; delete the generator's agent files (`AGENTS.md` and its `CLAUDE.md`): the kit's `CLAUDE.md` guides the agent, and adding the generator's agent tooling is an ADR; add its `.gitignore` lines to the kit's `.gitignore`, and its `.gitattributes` lines to the kit's except a `* text=…` line (it would override the kit's line endings). Set `name` in `package.json` to the project's code name in kebab case (the generator takes the folder's name), write `.nvmrc` (the Node major) and run `npm install`. Then `npx shadcn@latest init`; add Vitest: `npm install -D vitest jsdom @testing-library/react @testing-library/dom @vitest/coverage-v8 @types/node@^<the .nvmrc major>` (the generator's older `@types/node` blocks the install), a `vitest.config` with the jsdom environment and the `@` alias, one component test, and the scripts `\"test\": \"vitest run\"` and `\"lint\": \"eslint .\"`.",
+  "constraints": [],
+  "codeConventions": [
+    "- Server Components by default; `\"use client\"` only where state, effects or browser APIs need it.",
+    "- Validate every input at the boundary with zod: forms, route handlers, server actions and API responses.",
+    "- Secrets and API keys only on the server (`server-only`, environment variables without `NEXT_PUBLIC_`); `.env.example` lists every key.",
+    "- ESLint (Next config) passes before every commit.",
+    "- No hard-coded UI strings: message files, so another language can be added later; right-to-left layouts use logical classes (`ms-`, `me-`, `start-`, `end-`)."
+  ],
+  "commands": [
+    "- Install: `npm ci`",
+    "- Run: `npm run dev`",
+    "- Test: `npm test` (Vitest); end to end: `npx playwright test`",
+    "- Lint and build: `npm run lint`, `npm run build`"
+  ],
+  "testCommand": "npm test",
+  "checks": [
+    "npm run lint",
+    "npm test",
+    "npm run build"
+  ],
+  "coverage": {
+    "replaces": "npm test",
+    "command": "npm test -- --coverage --coverage.reporter=cobertura --coverage.reportsDirectory=TestResults/coverage",
+    "report": "TestResults/coverage",
+    "file": "cobertura-coverage.xml"
+  },
+  "testing": [
+    "Unit and components: Vitest with React Testing Library (`npm test` runs `vitest run`), for rules, hooks, zod schemas and components with logic.",
+    "API calls: mocked at the network boundary in unit tests (a fake `fetch` or MSW); the real API only in end-to-end tests.",
+    "End to end: Playwright for the main flow of each requirement, against `npm run build` and `npm start`; before a release and in CI once ENV-02 sets it up, not in the pull request checks unless an ADR adds it.",
+    "Requirement ID in the test name: `it('ORD-01: shows the test location', …)`, so `npm test -- -t ORD-01` runs one requirement.",
+    "Coverage (when `delivery.coverage` is set): the `@vitest/coverage-v8` package; without it Vitest stops and the check fails."
+  ],
+  "runSteps": "1. Install Node.js (the version in `.nvmrc`).\n2. `npm ci`\n3. Copy `.env.example` to `.env.local` and fill it.\n4. `npm test`\n5. `npm run dev`, then open http://localhost:3000.",
+  "gitignore": [
+    "node_modules/",
+    ".next/",
+    "out/",
+    "coverage/",
+    "TestResults/",
+    "playwright-report/",
+    "test-results/",
+    ".env",
+    ".env*.local",
+    "*.tsbuildinfo",
+    "next-env.d.ts"
+  ]
+}

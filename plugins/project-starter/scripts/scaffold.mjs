@@ -177,6 +177,11 @@ The supervisor chooses the language, framework, data store and test tools; each 
 #### Log
 - ${today} [created]`,
   ENV_DEPENDS: presetDef ? '' : ' | depends: ARC-02',
+  // How the preset's skeleton is made, and the choices it leaves open: ENV-01 settles them (as ADRs) before building.
+  ENV_SKELETON: presetDef?.skeleton ? `Skeleton: ${presetDef.skeleton}\n` : '',
+  ENV_CHOICES: presetDef?.openChoices?.length
+    ? `- [ ] Decided before the skeleton, each as an ADR (or already in the stack ADR): ${presetDef.openChoices.join('; ')}`
+    : '',
   TESTING_STACK: bullets([
     ...(presetDef?.testing?.length ? presetDef.testing : ['Not chosen yet: card ARC-02 records the test tools; fill this list then.']),
     ...moduleDefs.flatMap((m) => m.testing ?? []),

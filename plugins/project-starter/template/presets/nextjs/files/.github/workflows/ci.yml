@@ -1,0 +1,23 @@
+# Run the project checks on every pull request and on main.
+# Works on GitHub Actions and on Gitea/Forgejo Actions (same syntax). Remove it if the repo stays local only.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # The same checks as before a pull request on a dev machine: .project/config.json → delivery.checks
+      # (lint, tests, build, board, and the coverage floor when one is set). See docs/testing.md §4.
+      - name: Checks
+        run: node tools/checks/run-checks.mjs

@@ -307,5 +307,29 @@ ok(!/First requirements/.test(pm.split('## PM-02')[0]) && /requirements known so
 ok(!/commit or PR/.test(read(t2, 'docs/conventions.md')) && /git log --grep/.test(read(t2, 'docs/conventions.md')) && !/merged to main: <short sha>|PR #<n> opened/.test(readFileSync(join(KIT, 'skills/pr/SKILL.md'), 'utf8')), 'trial 2: no log line waits for a commit hash or PR number');
 ok(board(t2, '--check').status === 0, 'trial 2: dotnet "Task API" board is clean');
 
+// ── presets: laravel, nextjs, python (kit 0.4.0) ──
+const BOARD = 'node tools/board/build-board.mjs --check';
+const presetCases = {
+  dotnet: { checks: ['dotnet build', 'dotnet test'], cov: 'dotnet test --collect', choices: true },
+  laravel: { checks: ['php vendor/bin/pint --test', 'php artisan test'], cov: 'php vendor/bin/phpunit --coverage-cobertura', choices: true },
+  nextjs: { checks: ['npm run lint', 'npm test', 'npm run build'], cov: 'npm test -- --coverage', choices: true },
+  python: { checks: ['uv run ruff check .', 'uv run ruff format --check .', 'uv run mypy app', 'uv run pytest'], cov: 'uv run pytest --cov', choices: false },
+};
+for (const [p, want] of Object.entries(presetCases)) {
+  const d = join(SCR, `p-${p}`);
+  const r = sc2(d, 'Task API', ['--preset', p]);
+  const texts = ['CLAUDE.md', 'README.md', 'docs/testing.md', 'docs/board/cards/02-env.md', '.project/config.json'].map((f) => read(d, f)).join('\n');
+  const env1 = read(d, 'docs/board/cards/02-env.md').split('## ENV-02')[0];
+  ok(r.status === 0 && !/\{\{|<Name>/.test(texts) && board(d, '--check').status === 0, `preset ${p}: scaffolds with no placeholder left, clean board`);
+  ok(JSON.stringify(cfgOf(d).delivery.checks) === JSON.stringify([...want.checks, BOARD]) && existsSync(join(d, '.github/workflows/ci.yml')) && /run-checks\.mjs/.test(read(d, '.github/workflows/ci.yml')), `preset ${p}: checks in the config, CI runs run-checks`);
+  ok(/^Skeleton: /m.test(env1) && /Decided before the skeleton/.test(env1) === want.choices, `preset ${p}: ENV-01 has the skeleton${want.choices ? ' and the open choices' : ', no open choices'}`);
+  const dc2 = join(SCR, `p-${p}-cov`);
+  sc2(dc2, 'Task API', ['--preset', p, '--coverage', '80']);
+  const cv = cfgOf(dc2).delivery;
+  const replaced = JSON.parse(readFileSync(join(KIT, 'template/presets', p, 'preset.json'), 'utf8')).coverage.replaces;
+  ok(cv.checks.some((c) => c.startsWith(want.cov)) && !cv.checks.includes(replaced) && cv.coverage.report === 'TestResults/coverage', `preset ${p}: coverage swaps "${replaced}" for the command that writes the report`);
+}
+ok(!/^Skeleton: |Decided before the skeleton/m.test(read(join(SCR, 'b2-light'), 'docs/board/cards/02-env.md')), 'preset none: ENV-01 has no skeleton line and no open choices');
+
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);
