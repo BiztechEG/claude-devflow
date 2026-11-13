@@ -1,7 +1,7 @@
 {
   "title": "PHP, Laravel, MySQL, PHPUnit, Pint",
   "stack": [
-    "- PHP 8.3 or later and the current Laravel major; versions pinned in `composer.json` (`require.php`) and `composer.lock`",
+    "- PHP 8.3 or later (the major.minor in `.php-version`, which CI sets up) and the current Laravel major; versions pinned in `composer.json` (`require.php`) and `composer.lock`",
     "- UI: an ADR before ENV-01 (Livewire with Blade, Blade only, or an API only with Laravel Sanctum for a separate front end)",
     "- Data: MySQL 8 with Laravel migrations and Eloquent",
     "- Local environment: Laravel Sail (Docker) or PHP and MySQL installed locally",
@@ -12,7 +12,7 @@
     "the UI: Livewire with Blade, Blade only, or an API only (Sanctum) for a separate front end",
     "authentication: a Laravel starter kit, Fortify only, Sanctum tokens, or none yet"
   ],
-  "skeleton": "`composer create-project laravel/laravel <temporary folder>` (it needs an empty folder), then move its files here: keep the kit's `README.md`, `CLAUDE.md` and `CHANGELOG.md`; delete the generator's agent files (`AGENTS.md` and its `CLAUDE.md`): the kit's `CLAUDE.md` guides the agent, and adding the generator's agent tooling is an ADR; add its `.gitignore` lines to the kit's `.gitignore`, and its `.gitattributes` lines to the kit's except a `* text=…` line (it would override the kit's line endings). Then `php artisan key:generate` if `.env` has no key.",
+  "skeleton": "`composer create-project laravel/laravel <temporary folder>` (it needs an empty folder), then move its files here: keep the kit's `README.md`, `CLAUDE.md` and `CHANGELOG.md`; delete the generator's agent files (`AGENTS.md` and its `CLAUDE.md`): the kit's `CLAUDE.md` guides the agent, and adding the generator's agent tooling is an ADR; add its `.gitignore` lines to the kit's `.gitignore`, and its `.gitattributes` lines to the kit's except a `* text=…` line (it would override the kit's line endings). Then `php artisan key:generate` if `.env` has no key. Write `.php-version` with the local PHP major.minor (for example `8.4`): CI sets up that version.",
   "constraints": [],
   "codeConventions": [
     "- Laravel structure: thin controllers, validation in Form Requests, rules in models, actions or services; no repository layer over Eloquent without an ADR.",
@@ -47,7 +47,7 @@
     "Browser: tried by hand from the card's \"How to test\"; Laravel Dusk only by an ADR.",
     "Coverage (when `delivery.coverage` is set): the Xdebug or PCOV PHP extension; without one PHPUnit writes no report and the coverage check fails."
   ],
-  "runSteps": "1. Install PHP (the version in `composer.json` → `require.php`), Composer and MySQL 8, or Docker for Laravel Sail.\n2. `composer install`\n3. Copy `.env.example` to `.env`, set the `DB_*` keys, then `php artisan key:generate`.\n4. `php artisan migrate`\n5. With a UI: `npm install`, then `npm run build`.\n6. `php artisan test`\n7. `php artisan serve`, then open http://127.0.0.1:8000.",
+  "runSteps": "1. Install PHP (the version in `.php-version`), Composer and MySQL 8, or Docker for Laravel Sail.\n2. `composer install`\n3. Copy `.env.example` to `.env`, set the `DB_*` keys, then `php artisan key:generate`.\n4. `php artisan migrate`\n5. With a UI: `npm install`, then `npm run build`.\n6. `php artisan test`\n7. `php artisan serve`, then open http://127.0.0.1:8000.",
   "gitignore": [
     "/vendor/",
     "/node_modules/",

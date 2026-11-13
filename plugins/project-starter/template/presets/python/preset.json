@@ -8,7 +8,7 @@
     "- Layout: `app/` (the package), `tests/`, `alembic/`"
   ],
   "openChoices": [],
-  "skeleton": "`uv init --bare --python 3.12` (works in a folder that already has files), `uv python pin 3.12`, `uv add \"fastapi[standard]\" sqlalchemy alembic \"psycopg[binary]\" pydantic-settings`, `uv add --dev pytest ruff mypy`; `app/__init__.py` and `app/main.py` with a `/health` route, `tests/` with its test, `uv run alembic init alembic`; in `pyproject.toml` a `[tool.pytest.ini_options]` table with `pythonpath = [\".\"]` and `testpaths = [\"tests\"]` (so the tests import `app`); then `uv run ruff check --fix .` and `uv run ruff format .`, so the generated files (Alembic) pass the checks.",
+  "skeleton": "`uv init --bare --python 3.12` (works in a folder that already has files), `uv python pin 3.12`, `uv add \"fastapi[standard]\" sqlalchemy alembic \"psycopg[binary]\" pydantic-settings`, `uv add --dev pytest pytest-cov ruff mypy`; `app/__init__.py`, `app/main.py` with a `/health` route, `app/config.py` with a pydantic-settings `Settings` (`database_url` from `DATABASE_URL`, also read from `.env`) and `app/db.py` with the models' `Base` (SQLAlchemy `DeclarativeBase`); `.env.example` with `DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/<code name>`; `tests/` with a test for `/health` and one for the settings (`Settings(database_url=...)`, importing `Base`), since `--cov=app` counts every file in `app/`; `uv run alembic init alembic`, and in `alembic/env.py` the URL set from `Settings().database_url` and `target_metadata = Base.metadata`; in `pyproject.toml` a `[tool.pytest.ini_options]` table with `pythonpath = [\".\"]` and `testpaths = [\"tests\"]` (so the tests import `app`); then `uv run ruff check --fix .` and `uv run ruff format .`, so the generated files (Alembic) pass the checks.",
   "constraints": [],
   "codeConventions": [
     "- Type hints everywhere; `mypy app` passes.",
@@ -40,7 +40,7 @@
     "Unit: pytest in `tests/unit`, for rules with no database or network.",
     "API and integration: pytest in `tests/integration` with FastAPI's `TestClient` against a real PostgreSQL test database migrated with Alembic; never SQLite in place of PostgreSQL.",
     "Requirement ID in the test name: `def test_ord_01_shows_the_location()`, so `uv run pytest -k ord_01` runs one requirement.",
-    "Coverage (when `delivery.coverage` is set): the `pytest-cov` package in the dev dependencies; without it pytest stops on an unknown option and the check fails."
+    "Coverage (when `delivery.coverage` is set): the `pytest-cov` package (installed by the skeleton) writes the report; without it pytest stops on an unknown option and the check fails."
   ],
   "runSteps": "1. Install uv (it installs the Python version in `.python-version`) and PostgreSQL, or Docker.\n2. `uv sync`\n3. Copy `.env.example` to `.env` and set `DATABASE_URL`.\n4. `uv run alembic upgrade head`\n5. `uv run pytest`\n6. `uv run fastapi dev app/main.py`, then open http://127.0.0.1:8000/docs.",
   "gitignore": [
