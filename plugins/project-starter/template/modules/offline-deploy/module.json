@@ -1,0 +1,17 @@
+{
+  "title": "Installed on a client network without internet",
+  "docs": [
+    [
+      "docs/runbook.md",
+      "Server operations: install, update, backup and restore, the way back from a failed update"
+    ]
+  ],
+  "constraints": [
+    "**Fully offline:** no CDN, no online fonts, no online licence activation, no telemetry, no auto-updates. Everything the system needs is bundled in the install package.",
+    "Every install or update comes from a tagged release package; the runbook says how to roll back."
+  ],
+  "codeConventions": [],
+  "phases": [],
+  "replacements": {},
+  "gates": {}
+}

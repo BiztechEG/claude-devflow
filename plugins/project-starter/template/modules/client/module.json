@@ -1,0 +1,20 @@
+{
+  "title": "Outside client: questions, UAT and client approval",
+  "docs": [
+    [
+      "docs/questions.md",
+      "Open questions (client and internal) with their answers"
+    ]
+  ],
+  "constraints": [],
+  "codeConventions": [],
+  "phases": [],
+  "replacements": {
+    "CLIENT_ROLE": "- The **client** clarifies requirements, answers questions (`docs/questions.md`), runs acceptance testing (UAT) and gives final approval.",
+    "CLIENT_ROLE_ROW": "| Client | Clarifies requirements, answers questions, runs UAT, approves each requirement |",
+    "CLIENT_STATUS_ROWS": "| `clarify` | Waits on a client answer; the question is in `q: Q-xx` (required) | Client, then Claude records the answer |\n| `uat` | Handed to the client for acceptance testing | Client |",
+    "UAT_COMMA": ", `uat`",
+    "CLIENT_DONE_RULE": "; a requirement card becomes `done` only after the client accepts it in UAT, and the supervisor records that approval (`[approved]` log line)"
+  },
+  "gates": {}
+}

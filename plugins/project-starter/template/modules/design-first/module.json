@@ -1,0 +1,27 @@
+{
+  "title": "Design first: the client signs off the screens before the build",
+  "docs": [
+    [
+      "docs/design/",
+      "Screen list, design system and client approvals"
+    ]
+  ],
+  "constraints": [
+    "**No business logic before the screens are signed off** (DES-03 gate). Before that, code is allowed only for the environment, synthetic data and a prototype with fake data."
+  ],
+  "codeConventions": [
+    "- Screens are built from shared components; a pattern used twice becomes a component."
+  ],
+  "phases": [
+    {
+      "key": "design",
+      "after": "architecture",
+      "title": "Screen design",
+      "goal": "The client sees the whole system as a prototype with fake data and signs off the screens of each module."
+    }
+  ],
+  "replacements": {},
+  "gates": {
+    "build": "DES-03"
+  }
+}

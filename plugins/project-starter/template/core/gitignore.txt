@@ -1,0 +1,20 @@
+# Generated
+docs/board/board.html
+
+# Review run logs
+tools/review/logs/
+
+# Client files, backups and secrets never go to Git
+client-files/
+*.bak
+*.zip
+.env
+*.pfx
+
+# Editors and OS
+.vs/
+.vscode/*
+!.vscode/settings.json
+.idea/
+Thumbs.db
+.DS_Store

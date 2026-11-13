@@ -1,0 +1,50 @@
+{
+  "title": ".NET (C#), ASP.NET Core (Blazor UI or Web API), SQL Server, EF Core, xUnit",
+  "stack": [
+    "- .NET 10 (LTS), C#; SDK pinned in `global.json`",
+    "- Web: ASP.NET Core. The front end is chosen before ENV-01 builds the skeleton and recorded as an ADR: Blazor Server with MudBlazor for a line-of-business UI, a Web API only, or both",
+    "- Data: SQL Server (Express for small installs) with EF Core migrations",
+    "- Logging: Serilog. Background jobs: Hangfire (only when needed)",
+    "- Tests: xUnit; integration tests on a real local SQL Server",
+    "- Planned layout: `src/{{CODE_NAME}}.Web`, `src/{{CODE_NAME}}.Core`, `tests/{{CODE_NAME}}.Tests`"
+  ],
+  "constraints": [],
+  "codeConventions": [
+    "- Modular monolith. No CQRS, no MediatR, no extra layers.",
+    "- Nullable enabled (warnings are errors), async I/O, small clear services.",
+    "- EF Core migrations; never edit an applied migration.",
+    "- With a UI: no hard-coded UI strings, `.resx` resources, so another language can be added later."
+  ],
+  "commands": [
+    "- Build: `dotnet build`",
+    "- Test: `dotnet test`",
+    "- Run: `dotnet run --project src/{{CODE_NAME}}.Web`"
+  ],
+  "testCommand": "dotnet test",
+  "checks": [
+    "dotnet build",
+    "dotnet test"
+  ],
+  "coverage": {
+    "replaces": "dotnet test",
+    "command": "dotnet test --collect:\"XPlat Code Coverage\" --results-directory TestResults/coverage",
+    "report": "TestResults/coverage",
+    "file": "coverage.cobertura.xml"
+  },
+  "testing": [
+    "Unit: xUnit in `tests/{{CODE_NAME}}.Tests`, for domain rules (workflow transitions, numbering, calculations); no database.",
+    "Integration: xUnit against a real local SQL Server (never the EF Core in-memory provider), for queries, migrations and transactions.",
+    "Front end: with a Blazor UI, bUnit for components with logic; with a Web API, integration tests through `WebApplicationFactory` (`Microsoft.AspNetCore.Mvc.Testing`) for each endpoint. The rest is tried by hand from the card's \"How to test\".",
+    "Requirement ID on every test of a rule: `[Trait(\"Req\", \"ORD-01\")]`, so `dotnet test --filter Req=ORD-01` runs one requirement.",
+    "Coverage (when `delivery.coverage` is set): each test project references the `coverlet.collector` package (the `dotnet new xunit` template adds it); without it `dotnet test` writes no report and the coverage check fails."
+  ],
+  "runSteps": "1. Install the .NET SDK version in `global.json` (`dotnet --version` must be that version or a later one with the same major and minor number).\n2. `dotnet build`\n3. `dotnet test`\n4. `dotnet run --project src/{{CODE_NAME}}.Web`, then open the URL it prints (`Properties/launchSettings.json` → `applicationUrl`).",
+  "gitignore": [
+    "bin/",
+    "obj/",
+    "artifacts/",
+    "TestResults/",
+    "*.user",
+    "appsettings.*.local.json"
+  ]
+}

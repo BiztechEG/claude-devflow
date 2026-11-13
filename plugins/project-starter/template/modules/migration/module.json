@@ -1,0 +1,17 @@
+{
+  "title": "Data migration from an old system",
+  "docs": [
+    [
+      "docs/migration/",
+      "Migration plan, field mapping and rehearsal log"
+    ]
+  ],
+  "constraints": [
+    "**Data migration is mandatory:** existing identifiers (numbers, codes, barcodes) are preserved exactly.",
+    "The old system is read-only reference. Client database copies live outside the repo (or in ignored folders) and are never committed."
+  ],
+  "codeConventions": [],
+  "phases": [],
+  "replacements": {},
+  "gates": {}
+}

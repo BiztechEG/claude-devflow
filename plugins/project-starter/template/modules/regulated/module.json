@@ -1,0 +1,32 @@
+{
+  "title": "Regulated system: validation evidence (GAMP 5 style), risk per requirement, audit trail",
+  "docs": [
+    [
+      "docs/validation/",
+      "Validation plan and protocols; the traceability matrix and validation report are added by VAL-02 and VAL-03 (GAMP 5 terms)"
+    ]
+  ],
+  "constraints": [
+    "**Audit trail** on all important data; records are never silently overwritten. A change to an issued record produces a new revision.",
+    "Every requirement card has a `risk` level (`high`, `medium`, `low`) that sets the depth of its tests and protocol (`docs/validation/plan.md` §3).",
+    "Tests carry the requirement ID so the traceability matrix can be generated; a high-risk requirement needs both an automated test and a written protocol."
+  ],
+  "codeConventions": [
+    "- Integration tests run on the real database engine, never an in-memory substitute.",
+    "- Synthetic data only in tests and demos; never client data."
+  ],
+  "testing": [
+    "Test depth follows the requirement's `risk` (`docs/validation/plan.md` §3): a high-risk requirement has an automated test and an executed protocol in `docs/validation/protocols/`.",
+    "Test results of a release candidate are kept as validation evidence; they are never rerun over or edited."
+  ],
+  "phases": [
+    {
+      "key": "validation",
+      "after": "build",
+      "title": "Validation",
+      "goal": "Protocols executed on the release candidate, traceability complete, validation report signed and the system declared fit for use. Closing condition of the project, not a gate."
+    }
+  ],
+  "replacements": {},
+  "gates": {}
+}

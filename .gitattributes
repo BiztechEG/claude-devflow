@@ -1,0 +1,4 @@
+# Keep LF everywhere: the .sh scripts break under bash with CRLF, and the kit copies these files into new projects.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

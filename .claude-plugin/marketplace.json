@@ -1,0 +1,14 @@
+{
+  "name": "biztech",
+  "description": "The project-starter way of working for new projects.",
+  "owner": {
+    "name": "Biztech"
+  },
+  "plugins": [
+    {
+      "name": "project-starter",
+      "source": "./plugins/project-starter",
+      "description": "Start any project with the same way of working: requirements with stable IDs, ADRs, a board, independent review, hand-off notes and releases."
+    }
+  ]
+}
