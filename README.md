@@ -22,11 +22,11 @@ A Claude Code plugin that starts any new project with the same way of working, t
 In Claude Code:
 
 ```
-/plugin marketplace add <github-owner>/project-starter
+/plugin marketplace add BiztechEG/claude-project-starter
 /plugin install project-starter@biztech
 ```
 
-Or from a terminal: `claude plugin marketplace add <github-owner>/project-starter` and `claude plugin install project-starter@biztech`. The repository is private: your Git must be able to clone it (`git clone https://github.com/<github-owner>/project-starter` works). A local copy works too: `/plugin marketplace add <path to the folder>`.
+Or from a terminal: `claude plugin marketplace add BiztechEG/claude-project-starter` and `claude plugin install project-starter@biztech`. The repository is private: your Git must be able to clone it (`git clone https://github.com/BiztechEG/claude-project-starter` works). A local copy works too: `/plugin marketplace add <path to the folder>`.
 
 Updates: `claude plugin marketplace update biztech`, then `claude plugin update project-starter@biztech`, then restart Claude Code.
 

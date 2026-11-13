@@ -5,7 +5,7 @@ A short guide for day-to-day use. What the kit is and how it is built: [README.m
 ## 1. Install (once per machine)
 
 ```
-claude plugin marketplace add <github-owner>/project-starter
+claude plugin marketplace add BiztechEG/claude-project-starter
 claude plugin install project-starter@biztech
 ```
 
