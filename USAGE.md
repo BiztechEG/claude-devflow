@@ -1,20 +1,22 @@
-# Using project-starter
+# Using devflow
 
 A short guide for day-to-day use. What the kit is and how it is built: [README.md](README.md).
 
 ## 1. Install (once per machine)
 
 ```
-claude plugin marketplace add BiztechEG/claude-project-starter
-claude plugin install project-starter@biztech
+claude plugin marketplace add BiztechEG/claude-devflow
+claude plugin install devflow@biztech
 ```
 
-Then restart Claude Code. What the machine needs (Git, Node 18+, Codex or the `agents` reviewer): [README.md](README.md#needs). Always type the full command name (`/project-starter:review`, not `/review`).
+Then restart Claude Code. What the machine needs (Git, Node 18+, Codex or the `agents` reviewer): [README.md](README.md#needs). Always type the full command name (`/devflow:review`, not `/review`).
+
+Coming from `project-starter` (the old name), or without access to GitHub: [README.md](README.md#install-once-per-machine).
 
 ## 2. Start a project
 
 1. Open Claude Code in an empty folder.
-2. Run `/project-starter:kickoff`, and tell it in the same message what the project is and any requirements you already know.
+2. Run `/devflow:kickoff`, and tell it in the same message what the project is and any requirements you already know.
 3. Answer its questions: name, preset (`dotnet`, `laravel`, `nextjs`, `python` or `none`) and modules; then how work is delivered: where pull requests live (or not decided yet), the merge style, and a coverage minimum if you want one.
 4. Read what it reports, then read the project's `CLAUDE.md` and `docs/process.md`. Card PM-01 waits for your approval of them.
 5. Choose where the repository lives (card ENV-02). With preset `none`, also choose the stack (card ARC-02).
@@ -34,19 +36,19 @@ No module gives the light setup.
 | You want to | Say |
 |---|---|
 | Know where things stand | Start the session; Claude reads `NEXT.md` and gives the next card |
-| Add a feature, change or bug | `/project-starter:request <one sentence>` |
-| Add internal work (setup, refactor, tooling) | `/project-starter:card new <title>` |
-| Work on a card | `/project-starter:card start ENV-01`, and later `done ENV-01` |
-| Open the pull request of a finished card | `/project-starter:pr open ENV-01` (runs the checks first) |
-| See what waits on each branch | `/project-starter:pr status` |
-| Merge an approved card | `/project-starter:pr merge ENV-01` |
+| Add a feature, change or bug | `/devflow:request <one sentence>` |
+| Add internal work (setup, refactor, tooling) | `/devflow:card new <title>` |
+| Work on a card | `/devflow:card start ENV-01`, and later `done ENV-01` |
+| Open the pull request of a finished card | `/devflow:pr open ENV-01` (runs the checks first) |
+| See what waits on each branch | `/devflow:pr status` |
+| Merge an approved card | `/devflow:pr merge ENV-01` |
 | Approve a finished card | Tell Claude it is approved; the card goes to `done` |
-| Record a decision | `/project-starter:decision <the decision or the question>` |
-| Ask the client something | `/project-starter:question ask <question> [cards]`, then `answer Q-01 <answer>` |
-| Get finished work reviewed | `/project-starter:review ENV-01`, then read the triage |
-| Stop for the day | `/project-starter:handoff` |
-| Hand a build to anyone | `/project-starter:release 1.2.0` |
-| Switch the reply language | `/project-starter:set-language en` (or `ar-eg`; add `--global` for new projects) |
+| Record a decision | `/devflow:decision <the decision or the question>` |
+| Ask the client something | `/devflow:question ask <question> [cards]`, then `answer Q-01 <answer>` |
+| Get finished work reviewed | `/devflow:review ENV-01`, then read the triage |
+| Stop for the day | `/devflow:handoff` |
+| Hand a build to anyone | `/devflow:release 1.2.0` |
+| Switch the reply language | `/devflow:set-language en` (or `ar-eg`; add `--global` for new projects) |
 
 Claude never commits, merges, tags or pushes until you say so.
 
@@ -68,7 +70,7 @@ The reviewer only reads. Its report is kept as written in `docs/reviews/batch-N.
 
 ## 6. Defaults for new projects
 
-`~/.claude/project-starter.json` (every key optional):
+`~/.claude/devflow.json` (every key optional; `~/.claude/project-starter.json`, the old name, is read while it does not exist):
 
 ```json
 { "defaultReplyLanguage": "ar-eg", "defaultPreset": "dotnet", "defaultReviewer": "codex", "defaultModules": [], "defaultHost": "github", "defaultMerge": "squash", "defaultCoverage": 80 }
@@ -76,4 +78,4 @@ The reviewer only reads. Its report is kept as written in `docs/reviews/batch-N.
 
 ## 7. After changing the kit
 
-Claude Code runs a cached copy of the plugin. After editing this repo, bump `version` in `plugins/project-starter/.claude-plugin/plugin.json`, run `claude plugin marketplace update biztech` and `claude plugin update project-starter@biztech`, then restart Claude Code.
+Claude Code runs a cached copy of the plugin. After editing this repo, bump `version` in `plugins/devflow/.claude-plugin/plugin.json`, run `claude plugin marketplace update biztech` and `claude plugin update devflow@biztech`, then restart Claude Code.

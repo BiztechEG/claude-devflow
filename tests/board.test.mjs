@@ -7,16 +7,16 @@ import { join, dirname, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
-const KIT = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'plugins', 'project-starter');
-const SCR = join(tmpdir(), 'project-starter-tests');
+const KIT = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'plugins', 'devflow');
+const SCR = join(tmpdir(), 'devflow-tests');
 mkdirSync(SCR, { recursive: true });
-// The scaffold reads ~/.claude/project-starter.json: every run here gets an empty home, so this machine's defaults
+// The scaffold reads ~/.claude/devflow.json: every run here gets an empty home, so this machine's defaults
 // cannot change a result (KS4-08). homeWith() makes a home holding a given defaults file.
 const homeWith = (name, defaults) => {
   const h = join(SCR, name);
   rmSync(h, { recursive: true, force: true });
   mkdirSync(join(h, '.claude'), { recursive: true });
-  if (defaults) writeFileSync(join(h, '.claude', 'project-starter.json'), JSON.stringify(defaults));
+  if (defaults) writeFileSync(join(h, '.claude', 'devflow.json'), JSON.stringify(defaults));
   return { ...process.env, HOME: h, USERPROFILE: h };
 };
 const ENV = homeWith('home-empty');
@@ -220,7 +220,7 @@ const ds = join(SCR, 'b4-defstr');
 if (existsSync(ds)) rmSync(ds, { recursive: true, force: true });
 spawnSync('node', [`${KIT}/scripts/scaffold.mjs`, '--target', ds, '--name', 'S', '--no-git'], { env: homeWith('home-str', { defaultCoverage: '75' }) });
 const badDef = sc4([], homeWith('home-bad', { defaultCoverage: 150 }));
-ok(cfgOf(ds).delivery.coverage?.min === 75 && badDef.status === 1 && /defaultCoverage in .*project-starter\.json needs a whole percent/.test(badDef.stderr), 'KS4-07 defaultCoverage "75" read; 150 refused naming the file');
+ok(cfgOf(ds).delivery.coverage?.min === 75 && badDef.status === 1 && /defaultCoverage in .*devflow\.json needs a whole percent/.test(badDef.stderr), 'KS4-07 defaultCoverage "75" read; 150 refused naming the file');
 // KS4-03: coverage without a preset: ARC-02 asks for the report folder; until then the coverage check fails clearly
 const nc = join(SCR, 'b4-nopreset-cov');
 scaffold(nc, ['--coverage', '70']);
@@ -332,6 +332,24 @@ ok(/^\s+php-version-file: \.php-version\s*$/m.test(read(join(SCR, 'p-laravel'), 
 const pyEnv = read(join(SCR, 'p-python'), 'docs/board/cards/02-env.md');
 ok(/uv add --dev pytest pytest-cov /.test(pyEnv) && /target_metadata = Base\.metadata/.test(pyEnv) && /Settings\(\)\.database_url/.test(pyEnv), 'preset python: the skeleton installs pytest-cov and wires Alembic to DATABASE_URL and the models');
 ok(!/^Skeleton:|Decided before the skeleton/m.test(read(join(SCR, 'b2-light'), 'docs/board/cards/02-env.md')), 'preset none: ENV-01 has no skeleton line and no open choices');
+
+// ── rename to devflow (kit 0.5.0): ~/.claude/project-starter.json is still read when devflow.json is missing ──
+const legacyHome = homeWith('home-legacy');
+writeFileSync(join(SCR, 'home-legacy', '.claude', 'project-starter.json'), JSON.stringify({ defaultPreset: 'python', defaultReplyLanguage: 'ar-eg' }));
+const dl = join(SCR, 'legacy-defaults');
+if (existsSync(dl)) rmSync(dl, { recursive: true, force: true });
+const lr = spawnSync('node', [`${KIT}/scripts/scaffold.mjs`, '--target', dl, '--name', 'T', '--summary', 'S', '--no-git'], { encoding: 'utf8', env: legacyHome });
+ok(lr.status === 0 && cfgOf(dl).preset === 'python' && cfgOf(dl).replyLanguage === 'ar-eg', 'rename: scaffold reads project-starter.json when devflow.json is missing');
+const bothHome = homeWith('home-both', { defaultPreset: 'nextjs' });
+writeFileSync(join(SCR, 'home-both', '.claude', 'project-starter.json'), JSON.stringify({ defaultPreset: 'python' }));
+const db2 = join(SCR, 'both-defaults');
+if (existsSync(db2)) rmSync(db2, { recursive: true, force: true });
+spawnSync('node', [`${KIT}/scripts/scaffold.mjs`, '--target', db2, '--name', 'T', '--summary', 'S', '--lang', 'en', '--no-git'], { encoding: 'utf8', env: bothHome });
+ok(cfgOf(db2).preset === 'nextjs', 'rename: devflow.json wins over project-starter.json');
+const sl = spawnSync('node', [`${KIT}/scripts/set-language.mjs`, 'en', '--global'], { encoding: 'utf8', env: legacyHome });
+const slOut = JSON.parse(readFileSync(join(SCR, 'home-legacy', '.claude', 'devflow.json'), 'utf8'));
+ok(sl.status === 0 && slOut.defaultReplyLanguage === 'en' && slOut.defaultPreset === 'python', 'rename: set-language --global writes devflow.json, keeping the keys from project-starter.json');
+ok(!/project-starter/.test(['CLAUDE.md', 'NEXT.md', 'docs/process.md', 'docs/conventions.md'].map((f) => read(dl, f)).join('\n')), 'rename: a new project names only devflow');
 
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);

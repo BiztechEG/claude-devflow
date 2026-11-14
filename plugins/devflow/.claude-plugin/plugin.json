@@ -1,0 +1,6 @@
+{
+  "name": "devflow",
+  "version": "0.5.0",
+  "description": "Project kickoff and day-to-day workflow skills: /kickoff, /request, /card, /decision, /question, /pr, /review, /handoff, /release, /summary, /set-language.",
+  "author": { "name": "Biztech" }
+}

@@ -1,4 +1,6 @@
-# project-starter
+# devflow
+
+Formerly `project-starter` (renamed in 0.5.0; see [Moving from project-starter](#moving-from-project-starter)).
 
 A Claude Code plugin that starts any new project with the same way of working, taken from a real project and made generic:
 
@@ -22,17 +24,25 @@ A Claude Code plugin that starts any new project with the same way of working, t
 In Claude Code:
 
 ```
-/plugin marketplace add BiztechEG/claude-project-starter
-/plugin install project-starter@biztech
+/plugin marketplace add BiztechEG/claude-devflow
+/plugin install devflow@biztech
 ```
 
-Or from a terminal: `claude plugin marketplace add BiztechEG/claude-project-starter` and `claude plugin install project-starter@biztech`. The repository is private: your Git must be able to clone it (`git clone https://github.com/BiztechEG/claude-project-starter` works). A local copy works too: `/plugin marketplace add <path to the folder>`.
+Or from a terminal: `claude plugin marketplace add BiztechEG/claude-devflow` and `claude plugin install devflow@biztech`. The repository is private: your Git must be able to clone it (`git clone https://github.com/BiztechEG/claude-devflow` works). A local copy works too: `/plugin marketplace add <path to the folder>`.
 
-Updates: `claude plugin marketplace update biztech`, then `claude plugin update project-starter@biztech`, then restart Claude Code.
+Updates: `claude plugin marketplace update biztech`, then `claude plugin update devflow@biztech`, then restart Claude Code.
 
-Claude Code runs a **copy** of the plugin (`~/.claude/plugins/cache/biztech/project-starter/<version>/`), so edits here do not reach it by themselves, and `claude plugin update` does nothing while `version` in `plugin.json` is unchanged. After editing the kit, either bump the version and run `claude plugin update project-starter@biztech`, or reinstall (`claude plugin uninstall project-starter@biztech`, then `install` again); then start a new session or `/reload-plugins`. To try edits without installing, start Claude Code with `claude --plugin-dir plugins/project-starter` from this folder.
+Without access to GitHub (an offline or closed network): clone the repository on a machine that has access (or download it as a ZIP), copy the folder over, and run `/plugin marketplace add <path to the folder>`, then `/plugin install devflow@biztech`. For an update, replace the folder and run the two update commands above. Claude Code itself still needs to reach the model; the kit's scripts (`scaffold.mjs`, the board, `run-checks.mjs`) run with Node alone, and the preset skeletons download packages (composer, npm, uv, NuGet).
 
-Optional defaults for new projects, in `~/.claude/project-starter.json`:
+### Moving from project-starter
+
+1. `claude plugin uninstall project-starter@biztech`, then `claude plugin marketplace update biztech` and `claude plugin install devflow@biztech` (with the old repository URL, GitHub redirects to `BiztechEG/claude-devflow`; `git remote set-url origin https://github.com/BiztechEG/claude-devflow` in a clone).
+2. `~/.claude/project-starter.json` is still read while `~/.claude/devflow.json` does not exist; rename it when convenient.
+3. In a project made before the rename, replace `/project-starter:` with `/devflow:` and `project-starter:reviewer` with `devflow:reviewer` in `CLAUDE.md`, `NEXT.md` and `docs/` (one commit). Nothing else in the project names the kit.
+
+Claude Code runs a **copy** of the plugin (`~/.claude/plugins/cache/biztech/devflow/<version>/`), so edits here do not reach it by themselves, and `claude plugin update` does nothing while `version` in `plugin.json` is unchanged. After editing the kit, either bump the version and run `claude plugin update devflow@biztech`, or reinstall (`claude plugin uninstall devflow@biztech`, then `install` again); then start a new session or `/reload-plugins`. To try edits without installing, start Claude Code with `claude --plugin-dir plugins/devflow` from this folder.
+
+Optional defaults for new projects, in `~/.claude/devflow.json`:
 
 ```json
 { "defaultReplyLanguage": "ar-eg", "defaultPreset": "dotnet", "defaultReviewer": "codex", "defaultReviewerModel": "anthropic/claude-opus-5-5", "defaultModules": [], "defaultHost": "github", "defaultMerge": "squash", "defaultCoverage": 80 }
@@ -40,49 +50,49 @@ Optional defaults for new projects, in `~/.claude/project-starter.json`:
 
 Every key is optional (`defaultReviewerModel` is for opencode). Without the file: reply language `en`, preset `none`, reviewer `codex`, no modules, host not chosen (card ENV-02), squash merge, no coverage minimum.
 
-`/project-starter:set-language ar-eg --global` writes the language default for you.
+`/devflow:set-language ar-eg --global` writes the language default for you.
 
 ## Use
 
 Short how-to for daily use: [USAGE.md](USAGE.md).
 
-Open Claude Code in an empty folder and run `/project-starter:kickoff`. Then, day to day (always use the full `/project-starter:` name: a bare `/review` may run Claude Code's own review instead):
+Open Claude Code in an empty folder and run `/devflow:kickoff`. Then, day to day (always use the full `/devflow:` name: a bare `/review` may run Claude Code's own review instead):
 
 | Command | Does |
 |---|---|
-| `/project-starter:kickoff` | Creates the project from the template and fills it from the conversation |
-| `/project-starter:request` | Records a requirement with an ID and its card |
-| `/project-starter:card` | Adds a work card, or starts or finishes a card |
-| `/project-starter:decision` | Records a decision as an ADR |
-| `/project-starter:question` | Adds a client question, or records its answer (client module) |
-| `/project-starter:pr` | Runs the checks, opens the pull request (or readies the branch when local only), merges after approval |
-| `/project-starter:review` | Sends work to the reviewer, then triages the findings |
-| `/project-starter:summary` | End-of-task summary in the reply language |
-| `/project-starter:handoff` | Rewrites `NEXT.md` at the end of a session |
-| `/project-starter:release` | Changelog section, version and tag |
-| `/project-starter:set-language` | Switches the reply language (`ar-eg` or `en`) |
+| `/devflow:kickoff` | Creates the project from the template and fills it from the conversation |
+| `/devflow:request` | Records a requirement with an ID and its card |
+| `/devflow:card` | Adds a work card, or starts or finishes a card |
+| `/devflow:decision` | Records a decision as an ADR |
+| `/devflow:question` | Adds a client question, or records its answer (client module) |
+| `/devflow:pr` | Runs the checks, opens the pull request (or readies the branch when local only), merges after approval |
+| `/devflow:review` | Sends work to the reviewer, then triages the findings |
+| `/devflow:summary` | End-of-task summary in the reply language |
+| `/devflow:handoff` | Rewrites `NEXT.md` at the end of a session |
+| `/devflow:release` | Changelog section, version and tag |
+| `/devflow:set-language` | Switches the reply language (`ar-eg` or `en`) |
 
 Without Claude, the scaffold also runs by hand:
 
 ```
-node plugins/project-starter/scripts/scaffold.mjs --target <dir> --name "Name" [--code-name Name] --lang ar-eg --preset dotnet --modules client [--host github|none] [--merge squash] [--coverage 80|none]
+node plugins/devflow/scripts/scaffold.mjs --target <dir> --name "Name" [--code-name Name] --lang ar-eg --preset dotnet --modules client [--host github|none] [--merge squash] [--coverage 80|none]
 ```
 
 ## Reviewers
 
 - **codex** (default): `codex exec -s read-only`, a real read-only sandbox.
 - **opencode**: runs its `plan` agent, which is read-only only as far as your opencode permissions allow. Deny edits and shell commands for that agent in your opencode config before using it. The script warns when the working tree changed during a run.
-- **agents**: the plugin's `project-starter:reviewer` agent inside Claude, with read-only tools (Read, Grep, Glob); no Codex or opencode needed.
+- **agents**: the plugin's `devflow:reviewer` agent inside Claude, with read-only tools (Read, Grep, Glob); no Codex or opencode needed.
 
 ## Language
 
-Project files, code and commits are always in English. `replyLanguage` in the project's `.project/config.json` sets the language of Claude's messages, the review reports and the board page: `ar-eg` (Egyptian Arabic with English technical terms) or `en` (all English). It is not asked at kickoff: the default comes from `~/.claude/project-starter.json` and can be switched any time with `/project-starter:set-language`.
+Project files, code and commits are always in English. `replyLanguage` in the project's `.project/config.json` sets the language of Claude's messages, the review reports and the board page: `ar-eg` (Egyptian Arabic with English technical terms) or `en` (all English). It is not asked at kickoff: the default comes from `~/.claude/devflow.json` and can be switched any time with `/devflow:set-language`.
 
 ## Layout
 
 ```
 .claude-plugin/marketplace.json          the marketplace ("biztech")
-plugins/project-starter/
+plugins/devflow/
 ├─ .claude-plugin/plugin.json
 ├─ skills/<name>/SKILL.md                the commands above
 ├─ agents/reviewer.md                    read-only reviewer for the "agents" reviewer
@@ -97,7 +107,7 @@ plugins/project-starter/
 
 Tests: `node tests/board.test.mjs` scaffolds projects in the temp folder and checks the board, the scaffold and the checks runner (exit 1 on a failure).
 
-File formats: [template/core/docs/conventions.md](plugins/project-starter/template/core/docs/conventions.md).
+File formats: [template/core/docs/conventions.md](plugins/devflow/template/core/docs/conventions.md).
 
 ## Extending
 
