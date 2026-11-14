@@ -26,6 +26,7 @@
   const tip = document.getElementById('tip');
 
   // ── helpers ───────────────────────────────────────────────────────────────
+  const bdi = (s) => `<bdi>${esc(s)}</bdi>`;
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fill = (s, p = {}) => String(s).replace(/\{(\w+)\}/g, (m, k) => (k in p ? String(p[k]) : m));
   const t = (key, p) => fill(TX[key] ?? key, p);
@@ -58,7 +59,7 @@
   const taskLink = (id, withTitle = true) => {
     const x = T.get(id);
     if (!x) return esc(id);
-    return `<button type="button" class="link-btn" data-open="${id}"><span class="tid">${id}</span>${withTitle ? ' ' + esc(x.title) : ''}</button>`;
+    return `<button type="button" class="link-btn" data-open="${id}"><span class="tid">${id}</span>${withTitle ? ' ' + bdi(x.title) : ''}</button>`;
   };
 
   function tally(tasks) {
@@ -155,17 +156,17 @@
     const hero = next ? `
       <section class="card hero" aria-labelledby="next-title">
         <div class="eyebrow">${esc(t('nextEyebrow'))}</div>
-        <h2 id="next-title"><button type="button" data-open="${next.id}"><span class="tid">${next.id}</span> ${esc(next.title)}</button></h2>
+        <h2 id="next-title"><button type="button" data-open="${next.id}"><span class="tid">${next.id}</span> ${bdi(next.title)}</button></h2>
         <div class="chips">${statusPill(next.status)}${prioPill(next.priority)}${next.layers.map(layerPill).join('')}${typePill(next)}<span class="pill">${esc(SEC.get(next.section)?.title ?? next.section)}</span>${next.phase ? `<span class="pill">${esc(phLabel(next.phase))}</span>` : ''}<span class="pill" title="${esc(V.sizes[next.size].hint)}">${esc(t('size', { label: V.sizes[next.size].label }))}</span></div>
         <ul class="why">${whyNext(next).map((w) => `<li>${esc(w)}</li>`).join('')}</ul>
-        ${D.queue.length > 1 ? `<div class="queue"><span class="muted">${esc(t('queueAfter'))}</span>${D.queue.slice(1).map((id) => `<span class="arrow">${ARROW}</span><button type="button" class="qitem" data-open="${id}"><span class="tid">${id}</span> ${esc(T.get(id).title)}</button>`).join('')}</div>` : ''}
+        ${D.queue.length > 1 ? `<div class="queue"><span class="muted">${esc(t('queueAfter'))}</span>${D.queue.slice(1).map((id) => `<span class="arrow">${ARROW}</span><button type="button" class="qitem" data-open="${id}"><span class="tid">${id}</span> ${bdi(T.get(id).title)}</button>`).join('')}</div>` : ''}
       </section>` : `
       <section class="card hero"><div class="eyebrow">${esc(t('nextEyebrow'))}</div><h2>${esc(t('noNextTitle'))}</h2>
         <p class="muted">${esc(HAS_CLIENT ? t('noNextBodyClient') : t('noNextBody'))}</p></section>`;
 
     const currentBlock = current.length ? `
       <section class="card"><h2>${esc(t('currentTitle'))}</h2><div class="list">${current.map((x) => `
-        <div class="list-item">${prioPill(x.priority)}<div>${taskLink(x.id)}<div class="li-sub">${esc(SEC.get(x.section)?.title)}</div></div>${x.checks.total ? `<span class="small muted">${x.checks.done}/${x.checks.total}</span>` : ''}</div>`).join('')}</div></section>` : '';
+        <div class="list-item">${prioPill(x.priority)}<div>${taskLink(x.id)}<div class="li-sub">${bdi(SEC.get(x.section)?.title)}</div></div>${x.checks.total ? `<span class="small muted">${x.checks.done}/${x.checks.total}</span>` : ''}</div>`).join('')}</div></section>` : '';
 
     const kpi = (label, val, note, cls = '') => `<div class="kpi"><div class="k-label">${label}</div><div class="k-val ${cls}">${val}</div>${note ? `<div class="k-note">${note}</div>` : ''}</div>`;
     const RQ = D.requirements;
@@ -185,30 +186,30 @@
     </div></section>`;
 
     const byPhase = D.phases.length ? `<section class="card"><h2>${esc(t('byPhase'))}</h2><p class="card-sub">${esc(t('byPhaseSub'))}</p>${meterLegend()}<div class="rows">
-      ${D.phases.map((p) => rowMeter(`<span class="tid">${p.id}</span> ${esc(p.title)}`, D.tasks.filter((x) => x.phase === p.id), `data-goto-phase="${p.id}"`)).join('')}
+      ${D.phases.map((p) => rowMeter(`<span class="tid">${p.id}</span> ${bdi(p.title)}`, D.tasks.filter((x) => x.phase === p.id), `data-goto-phase="${p.id}"`)).join('')}
     </div></section>` : '';
 
     const bySection = `<section class="card"><h2>${esc(t('bySection'))}</h2>${meterLegend()}<div class="rows">
-      ${D.sections.map((s) => rowMeter(esc(s.title), D.tasks.filter((x) => x.section === s.id), `data-goto-section="${esc(s.id)}"`)).join('')}
+      ${D.sections.map((s) => rowMeter(bdi(s.title), D.tasks.filter((x) => x.section === s.id), `data-goto-section="${esc(s.id)}"`)).join('')}
     </div></section>`;
 
     const decisionsBlock = `<section class="card"><h2>${esc(t('waitSup'))}</h2><p class="card-sub">${esc(t('waitSupSub'))}</p>
-      ${decisions.length ? `<div class="list">${decisions.map((x) => `<div class="list-item">${prioPill(x.priority)}<div>${taskLink(x.id)}<div class="li-sub">${esc(SEC.get(x.section)?.title)}${x.unlocks ? ` · ${esc(t('holds', { cards: cardsWord(x.unlocks) }))}` : ''}</div></div><span></span></div>`).join('')}</div>` : `<div class="empty">${esc(t('nothingForYou'))}</div>`}
+      ${decisions.length ? `<div class="list">${decisions.map((x) => `<div class="list-item">${prioPill(x.priority)}<div>${taskLink(x.id)}<div class="li-sub">${bdi(SEC.get(x.section)?.title)}${x.unlocks ? ` · ${esc(t('holds', { cards: cardsWord(x.unlocks) }))}` : ''}</div></div><span></span></div>`).join('')}</div>` : `<div class="empty">${esc(t('nothingForYou'))}</div>`}
       ${blocked.length ? `<h3 class="small" style="margin:16px 0 6px">${esc(t('blockedTitle'))}</h3><div class="list">${blocked.map((x) => `<div class="list-item">${prioPill(x.priority)}<div>${taskLink(x.id)}</div><span></span></div>`).join('')}</div>` : ''}
     </section>`;
 
     const clientBlock = HAS_CLIENT ? `<section class="card"><h2>${esc(t('waitClient'))}</h2><p class="card-sub">${esc(t('waitClientSub'))}</p>
-      ${clarify.length ? `<div class="list">${clarify.map((x) => `<div class="list-item">${prioPill(x.priority)}<div>${taskLink(x.id)}<div class="li-sub">${qList(x.questions)} · ${esc(SEC.get(x.section)?.title)}</div></div><span></span></div>`).join('')}</div>` : `<div class="empty">${esc(t('nothingClient'))}</div>`}
+      ${clarify.length ? `<div class="list">${clarify.map((x) => `<div class="list-item">${prioPill(x.priority)}<div>${taskLink(x.id)}<div class="li-sub">${qList(x.questions)} · ${bdi(SEC.get(x.section)?.title)}</div></div><span></span></div>`).join('')}</div>` : `<div class="empty">${esc(t('nothingClient'))}</div>`}
     </section>` : '';
 
     const issuesBlock = `<section class="card"><h2>${esc(t('issues'))}</h2><p class="card-sub">${esc(t('issuesSub'))}</p>
-      ${issues.length ? `<div class="list">${issues.slice(0, 8).map((e) => `<div class="list-item"><span class="pill lt lt-issue">${esc(V.logTypes.issue.label)}</span><div><div class="small">${e.html}</div><div class="li-sub">${taskLink(e.task.id)} · ${esc(e.date)}</div></div><span></span></div>`).join('')}</div>` : `<div class="empty">${esc(t('noIssues'))}</div>`}
+      ${issues.length ? `<div class="list">${issues.slice(0, 8).map((e) => `<div class="list-item"><span class="pill lt lt-issue">${esc(V.logTypes.issue.label)}</span><div><div class="small" dir="auto">${e.html}</div><div class="li-sub">${taskLink(e.task.id)} · ${esc(e.date)}</div></div><span></span></div>`).join('')}</div>` : `<div class="empty">${esc(t('noIssues'))}</div>`}
     </section>`;
 
     // "created" lines only say a card exists; the feed is for work that happened.
     const worked = logs.filter((e) => e.type !== 'created');
     const activity = `<section class="card"><h2>${esc(t('recent'))}</h2>
-      ${worked.length ? `<div class="list">${worked.slice(0, 8).map((e) => `<div class="list-item"><span class="pill lt lt-${e.type}">${esc(V.logTypes[e.type].label)}</span><div><div class="small">${e.html}</div><div class="li-sub">${taskLink(e.task.id)} · ${esc(e.date)}</div></div><span></span></div>`).join('')}</div>
+      ${worked.length ? `<div class="list">${worked.slice(0, 8).map((e) => `<div class="list-item"><span class="pill lt lt-${e.type}">${esc(V.logTypes[e.type].label)}</span><div><div class="small" dir="auto">${e.html}</div><div class="li-sub">${taskLink(e.task.id)} · ${esc(e.date)}</div></div><span></span></div>`).join('')}</div>
       <p class="small" style="margin:10px 0 0"><a href="#/activity">${esc(t('allLog'))} ${ARROW}</a></p>` : `<div class="empty">${esc(t('noUpdatesYet'))}</div>`}
     </section>`;
 
@@ -267,7 +268,7 @@
     if (x.unlocks && x.status !== 'done') foot.push(esc(t('opens', { n: x.unlocks })));
     return `<button type="button" class="tcard${isNext ? ' is-next' : ''}" data-open="${x.id}">
       <div class="tc-top"><span class="tid">${x.id} · #${x.seq}</span><span class="chips">${isNext ? `<span class="badge-next">${esc(t('nextBadge'))}</span>` : ''}${typePill(x)}${prioPill(x.priority)}</span></div>
-      <div class="tc-title">${esc(x.title)}</div>
+      <div class="tc-title">${bdi(x.title)}</div>
       <div class="tc-sec">${esc(SEC.get(x.section)?.title ?? '')}${x.phase ? ` · ${esc(phLabel(x.phase))}` : ''}</div>
       <div class="chips">${x.layers.map(layerPill).join('')}</div>
       ${foot.length ? `<div class="tc-foot">${foot.join('<span aria-hidden="true">·</span>')}</div>` : ''}
@@ -297,7 +298,7 @@
       <thead><tr><th>#</th><th>${esc(t('thCard'))}</th><th>${esc(t('thStatus'))}</th><th>${esc(t('thPriority'))}</th><th>${esc(t('thLayers'))}</th><th>${esc(t('thDepends'))}</th><th>${esc(t('thPhase'))}</th></tr></thead>
       <tbody>${ts.map((x) => `<tr class="clickable" data-open="${x.id}" tabindex="0">
         <td class="num">${x.seq}</td>
-        <td>${typePill(x)} <span class="tid">${x.id}</span> ${esc(x.title)}${x.id === D.next ? ` <span class="badge-next">${esc(t('nextBadge'))}</span>` : ''}</td>
+        <td>${typePill(x)} <span class="tid">${x.id}</span> ${bdi(x.title)}${x.id === D.next ? ` <span class="badge-next">${esc(t('nextBadge'))}</span>` : ''}</td>
         <td>${statusPill(x.status)}</td><td>${prioPill(x.priority)}</td>
         <td><div class="chips">${x.layers.map(layerPill).join('')}</div></td>
         <td>${ownDeps(x).length ? ownDeps(x).map(depSpan).join(' ') : '<span class="muted">—</span>'}</td>
@@ -313,7 +314,7 @@
       const r = tally(all);
       const layers = LAYER_KEYS.filter((l) => all.some((x) => x.layers.includes(l)));
       return `<section class="card sec-card" id="sec-${esc(s.id)}">
-        <div class="sec-head"><div><h3><span class="tid">${esc(s.id)}</span> ${esc(s.title)}</h3><div class="chips" style="margin-top:6px">${layers.map(layerPill).join('')}</div></div>
+        <div class="sec-head"><div><h3><span class="tid">${esc(s.id)}</span> ${bdi(s.title)}</h3><div class="chips" style="margin-top:6px">${layers.map(layerPill).join('')}</div></div>
           <div class="sec-stats">${meter(all)}<div class="small muted" style="margin-top:6px">${esc(t('secStats', { pct: r.pct, done: r.by.done.n, n: r.n }))} · <span class="src">${esc(s.file)}</span></div></div></div>
         <div class="sec-desc">${s.html}</div>
         ${taskTable(ts)}</section>`;
@@ -331,14 +332,14 @@
     return intro + groups.map(({ p, ts }) => {
       const r = tally(ts);
       return `<section class="card phase" id="phase-${p ? p.id : 'all'}">
-        ${p ? `<div class="phase-head"><div><h3><span class="tid">${p.id}</span> ${esc(p.title)}</h3>${p.goal ? `<p class="phase-goal">${esc(p.goal)}</p>` : ''}${p.gate && p.gate.length ? `<p class="small muted" style="margin:4px 0 0">${fill(esc(TX.gateLine), { list: joinList(p.gate.map((g) => taskLink(g))) })}</p>` : ''}</div>
+        ${p ? `<div class="phase-head"><div><h3><span class="tid">${p.id}</span> ${bdi(p.title)}</h3>${p.goal ? `<p class="phase-goal">${bdi(p.goal)}</p>` : ''}${p.gate && p.gate.length ? `<p class="small muted" style="margin:4px 0 0">${fill(esc(TX.gateLine), { list: joinList(p.gate.map((g) => taskLink(g))) })}</p>` : ''}</div>
           <div class="sec-stats" style="min-width:220px">${meter(ts)}<div class="small muted" style="margin-top:6px">${r.pct}% · ${r.by.done.n}/${r.n}</div></div></div>
           ${p.html ? `<div class="sec-desc prose" style="margin-top:8px">${p.html}</div>` : ''}` : ''}
         <ol class="plan-list">${ts.map((x) => `
           <li class="plan-item${x.status === 'done' ? ' is-done' : ''}${x.id === D.next ? ' is-next' : ''}" data-open="${x.id}" tabindex="0">
             <div class="p-seq">${x.seq}</div>
-            <div><div class="p-title">${typePill(x)} <span class="tid">${x.id}</span> ${esc(x.title)} ${x.id === D.next ? badge : ''}</div>
-              <div class="p-deps">${esc(SEC.get(x.section)?.title)}${ownDeps(x).length ? esc(t('dependsOn')) + ownDeps(x).map(depSpan).join(' ') : ''}${x.unlocks ? ` · ${esc(t('opens', { n: x.unlocks }))}` : ''}</div></div>
+            <div><div class="p-title">${typePill(x)} <span class="tid">${x.id}</span> ${bdi(x.title)} ${x.id === D.next ? badge : ''}</div>
+              <div class="p-deps">${bdi(SEC.get(x.section)?.title)}${ownDeps(x).length ? esc(t('dependsOn')) + ownDeps(x).map(depSpan).join(' ') : ''}${x.unlocks ? ` · ${esc(t('opens', { n: x.unlocks }))}` : ''}</div></div>
             <div class="chips">${statusPill(x.status)}${prioPill(x.priority)}</div>
           </li>`).join('')}</ol></section>`;
     }).join('');
@@ -352,7 +353,7 @@
     const list = [...D.decisions].reverse();
     return intro + pendingBlock + (list.length ? list.map((d) => `
       <section class="card dec" id="dec-${d.id}">
-        <div class="dec-head"><span class="tid">${d.id}</span><h3>${esc(d.title)}</h3>
+        <div class="dec-head"><span class="tid">${d.id}</span><h3>${bdi(d.title)}</h3>
           <span class="pill dec-status-${d.status}">${esc((V.decisionStatuses[d.status] || { label: d.status }).label)}</span>
           ${d.supersededBy ? `<span class="small">${fill(esc(TX.supersededBy), { link: DEC.get(d.supersededBy) ? `<a class="ref" href="#/decision/${d.supersededBy}">${d.supersededBy}</a>` : esc(d.supersededBy) })}</span>` : ''}
           ${d.date ? `<span class="small muted">${esc(d.date)}</span>` : ''}</div>
@@ -385,7 +386,7 @@
       <section class="card">${shown.length ? [...byDay].map(([day, es]) => `
         <div class="tl-day">${esc(fmtDate(day))}</div>
         ${es.map((e) => `<div class="tl-item"><div><span class="pill lt lt-${e.type}">${esc(V.logTypes[e.type].label)}</span></div>
-          <div><div class="tl-body">${e.html}</div><div class="tl-task">${taskLink(e.task.id)}</div></div></div>`).join('')}`).join('') : `<div class="empty">${esc(t('noUpdates'))}</div>`}</section>`;
+          <div><div class="tl-body" dir="auto">${e.html}</div><div class="tl-task">${taskLink(e.task.id)}</div></div></div>`).join('')}`).join('') : `<div class="empty">${esc(t('noUpdates'))}</div>`}</section>`;
   }
 
   // ── task drawer ───────────────────────────────────────────────────────────
@@ -393,7 +394,7 @@
     const sec = SEC.get(x.section);
     const ph = PH.get(x.phase);
     const decs = (x.decisions || []).map((id) => DEC.get(id)).filter(Boolean);
-    const depChip = (id) => { const d = T.get(id); return `<button type="button" class="dep-chip" data-open="${id}"><span class="ico">${esc(V.statuses[d.status].icon)}</span><span class="tid">${id}</span> ${esc(d.title)}${x.gated.includes(id) ? ` <span class="muted small">${esc(t('gateNote'))}</span>` : ''}</button>`; };
+    const depChip = (id) => { const d = T.get(id); return `<button type="button" class="dep-chip" data-open="${id}"><span class="ico">${esc(V.statuses[d.status].icon)}</span><span class="tid">${id}</span> ${bdi(d.title)}${x.gated.includes(id) ? ` <span class="muted small">${esc(t('gateNote'))}</span>` : ''}</button>`; };
     const reqStatus = x.req && x.req.status ? `<span class="pill">${esc(V.reqStatuses[x.req.status] || x.req.status)}</span>` : '';
     const req = x.req ? `<div class="req-box"><div class="req-head"><span class="m-label">${esc(t('reqText'))}</span><span class="chips">${typePill(x)}${reqStatus}${x.req.source ? `<span class="pill">${esc(x.req.source)}</span>` : ''}</span></div><div class="prose">${x.req.html}</div></div>` : '';
     const meta = (label, val) => `<div><div class="m-label">${esc(label)}</div><div class="m-val">${val}</div></div>`;
@@ -401,13 +402,13 @@
       <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-title">
         <div class="drawer-head">
           <div class="dh-top"><span><span class="tid">${x.id}</span> <span class="small muted">· ${esc(t('seqLabel', { n: x.seq }))}</span></span><button type="button" class="icon-btn" data-close aria-label="${esc(t('close'))}">✕</button></div>
-          <h2 id="dr-title">${esc(x.title)}</h2>
+          <h2 id="dr-title">${bdi(x.title)}</h2>
           <div class="chips">${statusPill(x.status)}${prioPill(x.priority)}${riskPill(x.risk)}${x.layers.map(layerPill).join('')}${x.id === D.next ? `<span class="badge-next">${esc(t('nextCandidate'))}</span>` : ''}</div>
         </div>
         <div class="drawer-body">
           <div class="meta-grid">
             ${meta(t('mSection'), `<a href="#/sections/${x.section}">${esc(sec?.title ?? x.section)}</a>`)}
-            ${meta(t('mPhase'), ph ? `<a href="#/plan/${ph.id}">${ph.id} · ${esc(ph.title)}</a>` : esc(x.phase || '—'))}
+            ${meta(t('mPhase'), ph ? `<a href="#/plan/${ph.id}">${ph.id} · ${bdi(ph.title)}</a>` : esc(x.phase || '—'))}
             ${x.questions.length ? meta(t('mQuestions'), qList(x.questions)) : ''}
             ${meta(t('mSize'), `${esc(V.sizes[x.size].label)} <span class="muted small">(${esc(V.sizes[x.size].hint)})</span>`)}
             ${meta(t('mReadiness'), x.status === 'done' ? esc(V.statuses.done.label) : x.ready ? `<span class="ready">${esc(t('readyFull'))}</span>` : x.waitingOn.length ? esc(t('waitingOn', { x: cardsWord(x.waitingOn.length) })) : esc(V.statuses[x.status].label))}
@@ -417,9 +418,9 @@
           <div class="prose">${x.html || (x.req ? '' : `<p class="muted">${esc(t('noDesc'))}</p>`)}</div>
           ${x.depends.length ? `<h4>${esc(t('hDepends'))}</h4><div class="dep-list">${x.depends.map(depChip).join('')}</div>` : ''}
           ${x.dependents.length ? `<h4>${esc(t('hDependents'))}${x.unlocks > x.dependents.length ? esc(t('dependentsTotal', { cards: cardsWord(x.unlocks) })) : ''}</h4><div class="dep-list">${x.dependents.length > 12 ? `<span class="muted small">${esc(t('dependentsGate', { cards: cardsWord(x.dependents.length) }))}</span>` : x.dependents.map(depChip).join('')}</div>` : ''}
-          ${decs.length ? `<h4>${esc(t('hDecisions'))}</h4><div class="dep-list">${decs.map((d) => `<a class="dep-chip" href="#/decision/${d.id}"><span class="tid">${d.id}</span> ${esc(d.title)}</a>`).join('')}</div>` : ''}
+          ${decs.length ? `<h4>${esc(t('hDecisions'))}</h4><div class="dep-list">${decs.map((d) => `<a class="dep-chip" href="#/decision/${d.id}"><span class="tid">${d.id}</span> ${bdi(d.title)}</a>`).join('')}</div>` : ''}
           <h4>${esc(t('hLog'))}</h4>
-          ${x.log.length ? `<ol class="log">${[...x.log].reverse().map((e) => `<li class="lt-${e.type}-row"><div class="log-meta"><span class="pill lt lt-${e.type}">${esc(V.logTypes[e.type].label)}</span>${esc(e.date)}</div><div class="log-text">${e.html}</div></li>`).join('')}</ol>` : `<p class="muted small">${esc(t('noUpdatesYet'))}</p>`}
+          ${x.log.length ? `<ol class="log">${[...x.log].reverse().map((e) => `<li class="lt-${e.type}-row"><div class="log-meta"><span class="pill lt lt-${e.type}">${esc(V.logTypes[e.type].label)}</span>${esc(e.date)}</div><div class="log-text" dir="auto">${e.html}</div></li>`).join('')}</ol>` : `<p class="muted small">${esc(t('noUpdatesYet'))}</p>`}
           <p class="src" style="margin-top:24px">${esc(x.file)}:${x.line}</p>
         </div>
       </aside>`;

@@ -351,5 +351,18 @@ const slOut = JSON.parse(readFileSync(join(SCR, 'home-legacy', '.claude', 'devfl
 ok(sl.status === 0 && slOut.defaultReplyLanguage === 'en' && slOut.defaultPreset === 'python', 'rename: set-language --global writes devflow.json, keeping the keys from project-starter.json');
 ok(!/project-starter/.test(['CLAUDE.md', 'NEXT.md', 'docs/process.md', 'docs/conventions.md'].map((f) => read(dl, f)).join('\n')), 'rename: a new project names only devflow');
 
+// ── Arabic board, English files: every rendered block takes its direction from its own text ──
+const bd = join(SCR, 'bidi-ar');
+sc2(bd, 'T', ['--lang', 'ar-eg']);
+board(bd);
+const bhtml = read(bd, 'docs/board/board.html');
+const bdata = JSON.parse(bhtml.match(/<script id="board-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
+const env01 = bdata.tasks.find((x) => x.id === 'ENV-01');
+const blocks = env01.html.match(/<(p|ul|ol|h\d|table|blockquote)\b[^>]*>/g) ?? [];
+ok(/<html lang="ar[^"]*" dir="rtl">/.test(bhtml) && blocks.length > 1 && blocks.every((b) => / dir="auto"/.test(b)), 'bidi: an RTL board renders every Markdown block with dir="auto"');
+ok(env01.log.length && env01.log.every((e) => !/^<p\b/.test(e.html)), 'bidi: log lines lose their wrapping paragraph');
+const client = readFileSync(join(KIT, 'template/core/tools/board/board-client.js'), 'utf8');
+ok(!/esc\([\w.?()]*\.title\)/.test(client.replace('esc(document.title)', '')) && /class="log-text" dir="auto"/.test(client), 'bidi: card, phase, section and decision titles are isolated (<bdi>), log text is dir="auto"');
+
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);

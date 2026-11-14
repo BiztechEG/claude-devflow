@@ -192,7 +192,7 @@ function makeRenderer(knownRefs) {
       }
       return `<li${cls}>${box}<span>${inline([text, ...cont].join(' '))}</span>${nested.length ? renderList(nested) : ''}</li>`;
     }).join('');
-    return `<${tag}${tag === 'ul' && html.includes('task-item') ? ' class="tasklist"' : ''}>${html}</${tag}>`;
+    return `<${tag} dir="auto"${tag === 'ul' && html.includes('task-item') ? ' class="tasklist"' : ''}>${html}</${tag}>`;
   }
 
   const isBlockStart = (l) => /^(#{1,6}\s|```|>|\s*\|)/.test(l) || LIST_RE.test(l) || /^(-{3,}|\*{3,})\s*$/.test(l);
@@ -219,7 +219,7 @@ function makeRenderer(knownRefs) {
         const lv = m[1].length;
         const id = idPrefix + slug(m[2]);
         if (headings) headings.push({ lv, text: m[2].replace(/[`*]/g, ''), id });
-        out.push(`<h${lv} id="${id}">${inline(m[2])}</h${lv}>`);
+        out.push(`<h${lv} id="${id}" dir="auto">${inline(m[2])}</h${lv}>`);
         i++;
         continue;
       }
@@ -231,14 +231,14 @@ function makeRenderer(knownRefs) {
         while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]);
         const head = cellsOf(rows[0]).map((c) => `<th>${inline(c)}</th>`).join('');
         const body = rows.slice(2).map((r) => `<tr>${cellsOf(r).map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('');
-        out.push(`<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`);
+        out.push(`<div class="table-wrap"><table dir="auto"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`);
         continue;
       }
 
       if (/^>\s?/.test(l)) {
         const buf = [];
         while (i < lines.length && /^>\s?/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ''));
-        out.push(`<blockquote>${render(buf.join('\n'))}</blockquote>`);
+        out.push(`<blockquote dir="auto">${render(buf.join('\n'))}</blockquote>`);
         continue;
       }
 
@@ -257,7 +257,9 @@ function makeRenderer(knownRefs) {
       const buf = [l];
       i++;
       while (i < lines.length && !/^\s*$/.test(lines[i]) && !isBlockStart(lines[i])) buf.push(lines[i++]);
-      out.push(`<p>${inline(buf.join(' '))}</p>`);
+      // dir="auto" on every block: the files are in English while the page may be RTL, so each block takes
+      // its direction from its own text instead of the page's (an English sentence stays left to right).
+      out.push(`<p dir="auto">${inline(buf.join(' '))}</p>`);
     }
     return out.join('\n');
   }
@@ -748,7 +750,7 @@ function build({ write = true } = {}) {
         file: t.file, line: t.line, html,
         req: t.req ? { html: reqHtml, type: t.req.type, source: t.req.source, status: t.req.status, group: t.req.group } : null,
         checks: { done: checks.filter((c) => c[1] !== ' ').length, total: checks.length },
-        log: t.log.map((e) => ({ date: e.date, type: e.type, html: render(e.text).replace(/^<p>|<\/p>$/g, '') })),
+        log: t.log.map((e) => ({ date: e.date, type: e.type, html: render(e.text).replace(/^<p dir="auto">|<\/p>$/g, '') })),
         text: `${t.id} ${t.title} ${stripHtml(html)} ${stripHtml(reqHtml)} ${t.questions.join(' ')}`.toLowerCase(),
       };
     }),
