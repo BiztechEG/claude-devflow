@@ -28,9 +28,9 @@ In Claude Code:
 /plugin install devflow@biztech
 ```
 
-Or from a terminal: `claude plugin marketplace add BiztechEG/claude-devflow` and `claude plugin install devflow@biztech`. The repository is private: your Git must be able to clone it (`git clone https://github.com/BiztechEG/claude-devflow` works). A local copy works too: `/plugin marketplace add <path to the folder>`.
+Or from a terminal: `claude plugin marketplace add BiztechEG/claude-devflow` and `claude plugin install devflow@biztech`. The repository is public; your Git must be able to reach GitHub. A local copy works too: `/plugin marketplace add <path to the folder>`.
 
-Updates: `claude plugin marketplace update biztech`, then `claude plugin update devflow@biztech`, then restart Claude Code.
+Updates: `claude plugin marketplace update biztech`, then `claude plugin update devflow@biztech`, then restart Claude Code. A project keeps the copy of the board, checks and review tools it was made with: run `/devflow:update` in it to bring them up to the installed version.
 
 Without access to GitHub (an offline or closed network): clone the repository on a machine that has access (or download it as a ZIP), copy the folder over, and run `/plugin marketplace add <path to the folder>`, then `/plugin install devflow@biztech`. For an update, replace the folder and run the two update commands above. Claude Code itself still needs to reach the model; the kit's scripts (`scaffold.mjs`, the board, `run-checks.mjs`) run with Node alone, and the preset skeletons download packages (composer, npm, uv, NuGet).
 
@@ -70,6 +70,7 @@ Open Claude Code in an empty folder and run `/devflow:kickoff`. Then, day to day
 | `/devflow:summary` | End-of-task summary in the reply language |
 | `/devflow:handoff` | Rewrites `NEXT.md` at the end of a session |
 | `/devflow:release` | Changelog section, version and tag |
+| `/devflow:update` | Brings the project's kit tools (board, checks runner, review scripts) up to the installed version; never touches cards, docs or the config |
 | `/devflow:set-language` | Switches the reply language (`ar-eg` or `en`) |
 
 Without Claude, the scaffold also runs by hand:
@@ -98,6 +99,7 @@ plugins/devflow/
 ├─ agents/reviewer.md                    read-only reviewer for the "agents" reviewer
 ├─ scripts/scaffold.mjs                  creates a project (never overwrites a file)
 ├─ scripts/set-language.mjs              switches the reply language
+├─ scripts/update.mjs                    updates a project's kit tools (kit-tools.mjs: the list and hashes)
 └─ template/
    ├─ core/                              files every project gets
    ├─ lang/en.md, lang/ar-eg.md          the Communication block of CLAUDE.md

@@ -11,6 +11,7 @@ The file formats every project made from this kit follows. The board generator, 
 ├─ CHANGELOG.md              Keep a Changelog; one section per release tag
 ├─ NEXT.md                   session hand-off: where we stopped, what comes next (short, overwritten)
 ├─ .project/config.json      kit settings (section 2)
+├─ .project/kit.json         kit version and a hash of each tool file as the kit wrote it (section 2)
 ├─ .claude/settings.json     hooks: rebuild the board after edits
 ├─ .github/pull_request_template.md   sections every pull request description has
 ├─ docs/
@@ -77,6 +78,8 @@ The global default for new projects is in `~/.claude/devflow.json`:
 ```
 
 Every key is optional. Without the file: reply language `en`, preset `none`, reviewer `codex`, no modules, host not chosen, squash merge, no coverage minimum. The scaffold's `--host none` and `--coverage none` override a default here.
+
+`.project/kit.json` is written by the kit, never by hand: `{ "kit": "devflow", "version": "0.5.2", "files": { "tools/board/build-board.mjs": "<hash>", … } }`, the kit version and, for each file under `tools/board/`, `tools/checks/` and `tools/review/`, a hash of the copy the kit wrote (line endings ignored). `/devflow:update` uses it to replace the files that are only older and to keep the ones edited in the project unless the supervisor says otherwise. Edits to those tools are allowed but are kept out of later kit updates until merged by hand.
 
 ## 3. Requirements (`docs/requirements.md`)
 
@@ -189,7 +192,7 @@ Notes or the rule it follows (see ADR-004).
 ## 8. Git
 
 - Branch per card: `<card-id>-short-slug` (`ORD-01-test-location`).
-- Commit messages in English, starting with the card ID: `ORD-01: show the test location on the order`. Work on several cards names them all (`ORD-01, ORD-02: …`); board and hand-off upkeep that belongs to no card starts with `docs:` (`docs: update NEXT.md`).
+- Commit messages in English, starting with the card ID: `ORD-01: show the test location on the order`. Work on several cards names them all (`ORD-01, ORD-02: …`); board and hand-off upkeep that belongs to no card starts with `docs:` (`docs: update NEXT.md`); a kit tools update (`/devflow:update`) is `chore: update devflow tools to <version>`.
 - Merge to `main` through a pull request (`/devflow:pr`; local only: the branch and its description) after review, the supervisor's approval and passing checks, the way `delivery.merge` says.
 - Pull request title: `<IDs>: <card title>`; description: the sections of `.github/pull_request_template.md`.
 - Tag every release handed to anyone: `v1.2.0`, `v1.3.0-rc.1`. `CHANGELOG.md` gets the section at the same time.

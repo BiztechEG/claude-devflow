@@ -364,5 +364,41 @@ ok(env01.log.length && env01.log.every((e) => !/^<p\b/.test(e.html)), 'bidi: log
 const client = readFileSync(join(KIT, 'template/core/tools/board/board-client.js'), 'utf8');
 ok(!/esc\([\w.?()]*\.title\)/.test(client.replace('esc(document.title)', '')) && /class="log-text" dir="auto"/.test(client), 'bidi: card, phase, section and decision titles are isolated (<bdi>), log text is dir="auto"');
 
+// ── /devflow:update: the kit's tools in an existing project (kit 0.5.2) ──
+const upd = (d, ...a) => spawnSync('node', [`${KIT}/scripts/update.mjs`, '--target', d, ...a], { encoding: 'utf8', env: ENV });
+const kitVer = JSON.parse(readFileSync(join(KIT, '.claude-plugin/plugin.json'), 'utf8')).version;
+const ud = join(SCR, 'upd');
+sc2(ud, 'T', ['--preset', 'none']);
+const kj = () => JSON.parse(read(ud, '.project/kit.json'));
+const toolCount = kj().files ? Object.keys(kj().files).length : 0;
+ok(kj().version === kitVer && toolCount >= 10 && Object.keys(kj().files).every((f) => f.startsWith('tools/')) && /Everything is current/.test(upd(ud).stdout), 'update: a new project records the kit version and its tool hashes; nothing to update');
+const RC = 'tools/checks/run-checks.mjs', BC = 'tools/board/board.css', BJ = 'tools/board/board-client.js', PJ = 'tools/review/prompt.mjs';
+const kitOf = (f) => readFileSync(join(KIT, 'template/core', f), 'utf8');
+// An older copy (recorded as the kit wrote it), a local edit, a CRLF copy and a missing file.
+const rec = kj();
+writeFileSync(join(ud, BC), '/* old */\n'); rec.files[BC] = (await import(`file://${KIT.replace(/\\/g, '/')}/scripts/kit-tools.mjs`)).hashOf('/* old */\n');
+writeFileSync(join(ud, '.project/kit.json'), JSON.stringify(rec));
+appendFileSync(join(ud, RC), '// local edit\n');
+writeFileSync(join(ud, BJ), kitOf(BJ).replace(/\n/g, '\r\n'));
+rmSync(join(ud, PJ));
+const before = ['CLAUDE.md', '.project/config.json', 'docs/board/cards/02-env.md'].map((f) => read(ud, f)).join('\0');
+const dry = upd(ud).stdout;
+ok(/update\s+tools\/board\/board\.css/.test(dry) && /changed\s+tools\/checks\/run-checks\.mjs/.test(dry) && /current\s+tools\/board\/board-client\.js/.test(dry) && /add\s+tools\/review\/prompt\.mjs/.test(dry) && read(ud, BC) === '/* old */\n', 'update: dry run sorts files into update, changed, current (CRLF ignored), add, and writes nothing');
+const ap = upd(ud, '--apply');
+ok(ap.status === 0 && read(ud, BC) === kitOf(BC) && existsSync(join(ud, PJ)) && /\/\/ local edit/.test(read(ud, RC)) && /kept 1: tools\/checks\/run-checks\.mjs/.test(ap.stdout), 'update: --apply writes the older and missing files, keeps the locally edited one');
+ok(/changed\s+tools\/checks\/run-checks\.mjs/.test(upd(ud).stdout) && kj().version === kitVer, 'update: a kept edited file is still "changed" next time');
+ok(upd(ud, '--apply', '--include', RC).status === 0 && read(ud, RC) === kitOf(RC) && /Everything is current/.test(upd(ud).stdout), 'update: --include replaces an edited file');
+ok(['CLAUDE.md', '.project/config.json', 'docs/board/cards/02-env.md'].map((f) => read(ud, f)).join('\0') === before, 'update: cards, CLAUDE.md and the config are never touched');
+// A project from before kit.json: differing files are "unknown" until included or --all.
+rmSync(join(ud, '.project/kit.json'));
+writeFileSync(join(ud, BC), '/* made with an older kit */\n');
+const old = upd(ud, '--apply');
+ok(/unknown\s+tools\/board\/board\.css/.test(old.stdout) && read(ud, BC) === '/* made with an older kit */\n' && !kj().files[BC] && kj().files[RC], 'update: without kit.json a differing file is unknown and kept; the record is written');
+ok(upd(ud, '--apply', '--all').status === 0 && read(ud, BC) === kitOf(BC), 'update: --all replaces unknown files');
+const notProject = upd(join(SCR, 'home-empty'));
+const badInc = upd(ud, '--include', 'docs/plan.md');
+ok(notProject.status === 1 && /config\.json not found/.test(notProject.stderr) && badInc.status === 1 && /not a kit file/.test(badInc.stderr), 'update: refuses a folder without .project/config.json and a non-kit --include');
+ok(existsSync(join(KIT, 'skills/update/SKILL.md')) && /scripts\/update\.mjs/.test(readFileSync(join(KIT, 'skills/update/SKILL.md'), 'utf8')) && /\.project\/kit\.json/.test(read(ud, 'docs/conventions.md')), 'update: the skill calls the script; conventions.md describes kit.json');
+
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);

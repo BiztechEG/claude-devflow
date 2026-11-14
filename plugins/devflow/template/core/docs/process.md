@@ -60,7 +60,7 @@ A card is done when:
 ## 6. Branches, commits and review
 
 - One branch per card: `<card-id>-short-slug`. Small cards may share a branch only when they change the same files.
-- Commits start with the card ID: `ORD-01: show the test location on the order` (several cards: all their IDs; upkeep of the board or `NEXT.md` alone: `docs:`). Commit only when the supervisor asks. The card's log lines and status go into the same commit as the work (no line waits for a hash: `docs/conventions.md` §5), so the tree is clean when the pull request opens and when it merges.
+- Commits start with the card ID: `ORD-01: show the test location on the order` (several cards: all their IDs; upkeep of the board or `NEXT.md` alone: `docs:`; a kit tools update: `chore:`). Commit only when the supervisor asks. The card's log lines and status go into the same commit as the work (no line waits for a hash: `docs/conventions.md` §5), so the tree is clean when the pull request opens and when it merges.
 - Policy in `.project/config.json` → `delivery`: where pull requests live (`host`, chosen in ENV-02), how they merge (`merge`), the checks and the coverage floor. Changing it is a supervisor decision and an ADR.
 - **Pull request** (`/devflow:pr open <ID>`): the checks pass first, then the description follows `.github/pull_request_template.md` (cards, what changed, how to test, checks, docs, review, definition of done). Local only: the branch and that description, reviewed on `git diff main...<branch>`.
 - Review happens **before** merge, on the pull request's diff. One batch per card or per small group of related cards, so findings stay small and easy to triage.

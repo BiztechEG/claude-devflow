@@ -19,6 +19,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname, relative, resolve, extname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { KIT_FILE, hashOf, kitTools, kitRecord } from './kit-tools.mjs';
 import { homedir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 
@@ -290,6 +291,11 @@ const config = {
   },
 };
 write('.project/config.json', `${JSON.stringify(config, null, 2)}\n`);
+// The kit version and a hash of each tool file as written, so /devflow:update can tell a file the project
+// changed from one that is only older (scripts/update.mjs). A tool file that already existed is not recorded.
+const toolHashes = {};
+for (const [rel, src] of kitTools()) if (created.includes(rel)) toolHashes[rel] = hashOf(readFileSync(src));
+write(KIT_FILE, kitRecord(toolHashes));
 
 // ─── Git and report ──────────────────────────────────────────────────────────
 

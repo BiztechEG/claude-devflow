@@ -5,7 +5,7 @@
 ## Current phase and hard rules
 
 - The current phase, what is allowed in it and what comes next are in `NEXT.md` (session start) and `docs/plan.md` (phases and gates).
-- **Commit only when the supervisor asks.** Commit messages are in English and start with the card ID (`ORD-01: …`; several cards: all their IDs; board or `NEXT.md` upkeep alone: `docs:`).
+- **Commit only when the supervisor asks.** Commit messages are in English and start with the card ID (`ORD-01: …`; several cards: all their IDs; board or `NEXT.md` upkeep alone: `docs:`; kit tools update (`/devflow:update`): `chore:`).
 - **No work outside the board.** A new request is recorded in `docs/requirements.md` with an ID first, then gets its card (`/devflow:request`). Work found while doing a card becomes its own card (`/devflow:card`), not a hidden extra.
 - **Decisions are recorded the moment they are made** as an ADR in `docs/adr/` (`/devflow:decision`). Never rewrite an accepted ADR: supersede it with a new one.
 - **Independent review:** finished work goes to the reviewer set in `.project/config.json` (`/devflow:review`). The reviewer only reads; Claude triages the findings in `docs/reviews/triage.md` and applies the accepted fixes.

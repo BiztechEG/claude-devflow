@@ -48,6 +48,7 @@ No module gives the light setup.
 | Get finished work reviewed | `/devflow:review ENV-01`, then read the triage |
 | Stop for the day | `/devflow:handoff` |
 | Hand a build to anyone | `/devflow:release 1.2.0` |
+| Bring the board and the other kit tools up to the installed devflow | `/devflow:update` (shows what changes, asks about files edited in the project) |
 | Switch the reply language | `/devflow:set-language en` (or `ar-eg`; add `--global` for new projects) |
 
 Claude never commits, merges, tags or pushes until you say so.
